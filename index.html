@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz FMP - Faculdade Municipal de Palhoça</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1a1a4d, #b30000);
+      margin: 0;
+      padding: 40px 60px;
+      color: #f0f0f0;
+      min-width: 480px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #ffe6e6;
+      text-shadow: 1px 1px 3px #660000;
+      margin-bottom: 40px;
+      font-size: 2.8rem;
+    }
+
+    .quiz-container {
+      max-width: 700px;
+      margin: auto;
+      background-color: #0d1436;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 25px rgba(255, 0, 0, 0.7);
+      border: 2px solid #b30000;
+    }
+
+    .pergunta {
+      display: none;
+      margin-bottom: 25px;
+    }
+
+    .pergunta.active {
+      display: block;
+    }
+
+    .pergunta h3 {
+      margin: 0 0 15px;
+      color: #ff6666;
+      font-size: 1.5rem;
+      text-shadow: 1px 1px 2px #330000;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 12px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 8px 15px;
+      border-radius: 8px;
+      background-color: #330000;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+
+    label:hover {
+      background-color: #660000;
+    }
+
+    input[type="radio"] {
+      margin-right: 10px;
+      accent-color: #ff4d4d;
+      cursor: pointer;
+    }
+
+    button {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 12px 30px;
+      font-size: 1.25rem;
+      background-color: #003366;
+      color: #ff9999;
+      border: 2px solid #ff4d4d;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      box-shadow: 0 0 10px #ff1a1a;
+    }
+
+    button:hover {
+      background-color: #b30000;
+      color: #fff0f0;
+      border-color: #660000;
+      box-shadow: 0 0 15px #ff0000;
+    }
+
+    #resultado {
+      margin-top: 30px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #ffcccc;
+      text-align: center;
+      white-space: pre-line;
+      text-shadow: 1px 1px 2px #660000;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 30px 20px;
+      }
+      .quiz-container {
+        padding: 20px 25px;
+      }
+      h1 {
+        font-size: 2.2rem;
+      }
+      .pergunta h3 {
+        font-size: 1.3rem;
+      }
+      label {
+        font-size: 1rem;
+      }
+      button {
+        font-size: 1.1rem;
+        padding: 10px 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧠 Quiz FMP - Faculdade Municipal de Palhoça</h1>
+  <div class="quiz-container" id="quiz"></div>
+  <div style="text-align: center;">
+    <button id="botaoProxima" onclick="proximaPergunta()">Próxima</button>
+    <button id="botaoResultado" onclick="verificarRespostas()" style="display:none">Ver Resultado</button>
+  </div>
+  <div id="resultado"></div>
+
+  <script>
+    const perguntas = [
+      { pergunta: "1. Em que ano a FMP foi fundada?", opcoes: ["2000", "2005", "2002", "2010"], resposta: "2005" },
+      { pergunta: "2. Quantos cursos de graduação a FMP oferece atualmente?", opcoes: ["3", "5", "6", "4"], resposta: "4" },
+      { pergunta: "3. Quais desses cursos a FMP não oferece?", opcoes: ["Análise e Desenvolvimento de Sistemas", "Administração", "Letras", "Pedagogia"], resposta: "Letras" },
+      { pergunta: "4. Quantos laboratórios a FMP têm?", opcoes: ["5", "6", "4", "7"], resposta: "5" },
+      { pergunta: "5. Qual o aniversário da faculdade?", opcoes: ["16/7", "21/12", "25/10", "10/10"], resposta: "25/10" },
+      { pergunta: "6. Quantas fases possui o curso de Análise e Desenvolvimento de Sistemas?", opcoes: ["7", "4", "5", "5"], resposta: "5" },
+      { pergunta: "7. Quantas fases possui o curso de Pedagogia?", opcoes: ["5", "6", "7", "4"], resposta: "7" },
+      { pergunta: "8. Quantas fases possui o curso de Administração?", opcoes: ["4", "6", "4", "5"], resposta: "5" },
+      { pergunta: "9. Qual é o nome da música tradicional associada à FMP?", opcoes: ["Bom viver", "Doce sabor", "Açafrão amarelo", "Gálio do sul"], resposta: "Açafrão amarelo" },
+      { pergunta: "10. Qual a cor oficial da FMP?", opcoes: ["Azul", "Vermelho", "Verde", "Roxo"], resposta: "Azul" },
+      { pergunta: "11. Quem fundou a FMP?", opcoes: ["Prof. Orion Neto", "Dra. Lúcia Vega", "Prefeitura", "Reitor Cosmo Galvão"], resposta: "Prefeitura" },
+      { pergunta: "12. Qual é o nome da biblioteca principal da FMP?", opcoes: ["Biblioteca Galileu", "Biblioteca Estelar", "Biblioteca do Saber", "Biblioteca Estrela Guia"], resposta: "Biblioteca Estrela Guia" },
+      { pergunta: "13. Qual o bairro onde está localizada a sede da FMP?", opcoes: ["Centro", "Ponte do Imaruim", "Bela Vista", "Passa Vinte"], resposta: "Ponte do Imaruim" },
+      { pergunta: "14. Quantos alunos aproximadamente a FMP possui?", opcoes: ["1100", "500", "750", "950"], resposta: "1100" },
+      { pergunta: "15. E quantos professores a FMP possui?", opcoes: ["30", "40", "50", "20"], resposta: "50" },
+      { pergunta: "16. Qual curso tem maior participação na Feira de Inovação da FMP?", opcoes: ["Administração", "ADS", "Pedagogia", "Gestão de Turismo"], resposta: "ADS" },
+      { pergunta: "17. Qual é a modalidade dos cursos oferecidos pela FMP?", opcoes: ["EAD", "Presencial", "Híbrido", "Online ao vivo"], resposta: "Presencial" },
+      { pergunta: "18. Qual curso da FMP teve parceria recente com escolas municipais para projeto de alfabetização?", opcoes: ["Administração", "ADS", "Pedagogia", "Gestão Pública"], resposta: "ADS" },
+      { pergunta: "19. Qual é o nome do programa de pós-graduação oferecido em 2025?", opcoes: ["Gestão Escolar", "MBA em Tecnologia", "Letras Aplicadas", "Engenharia Pedagógica"], resposta: "Gestão Escolar" },
+      { pergunta: "20. Quantas vagas a FMP destinou para o curso de Administração (manhã e noite) no último vestibular?", opcoes: ["50", "100", "200", "150"], resposta: "200" }
+    ];
+
+    const quizDiv = document.getElementById("quiz");
+    let respostasCertas = 0;
+    let indiceAtual = 0;
+
+    function mostrarPergunta(indice) {
+      quizDiv.innerHTML = "";
+      const item = perguntas[indice];
+
+      const div = document.createElement("div");
+      div.classList.add("pergunta", "active");
+
+      const titulo = document.createElement("h3");
+      titulo.textContent = item.pergunta;
+      div.appendChild(titulo);
+
+      item.opcoes.forEach(opcao => {
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "q" + indice;
+        input.value = opcao;
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(" " + opcao));
+        div.appendChild(label);
+      });
+
+      quizDiv.appendChild(div);
+    }
+
+    function proximaPergunta() {
+      const radios = document.getElementsByName("q" + indiceAtual);
+      let selecionado = false;
+      for (const radio of radios) {
+        if (radio.checked) {
+          selecionado = true;
+          if (radio.value === perguntas[indiceAtual].resposta) {
+            respostasCertas++;
+          }
+        }
+      }
+      if (!selecionado) {
+        alert("Por favor, selecione uma opção antes de continuar.");
+        return;
+      }
+      indiceAtual++;
+      if (indiceAtual < perguntas.length) {
+        mostrarPergunta(indiceAtual);
+      } else {
+        document.getElementById("botaoProxima").style.display = "none";
+        document.getElementById("botaoResultado").style.display = "inline-block";
+        quizDiv.innerHTML = "";
+      }
+    }
+
+    function verificarRespostas() {
+      const notaFinal = (respostasCertas / perguntas.length) * 100;
+      let mensagem = "";
+
+      if (notaFinal === 100) {
+        mensagem = "Excelente! Você gabaritou o quiz! 🎉";
+      } else if (notaFinal >= 80) {
+        mensagem = "Muito bom! Você tem um ótimo conhecimento sobre a FMP. 👍";
+      } else if (notaFinal >= 60) {
+        mensagem = "Bom trabalho! Mas dá pra melhorar. 😉";
+      } else {
+        mensagem = "Continue estudando sobre a FMP. Você vai conseguir! 💪";
+      }
+
+      document.getElementById("resultado").textContent =
+        `Você acertou ${respostasCertas} de ${perguntas.length} perguntas!\nSua pontuação foi ${notaFinal.toFixed(1)} pontos.\n${mensagem}`;
+    }
+
+    mostrarPergunta(indiceAtual);
+  </script>
+</body>
+</html>
